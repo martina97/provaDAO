@@ -4,15 +4,15 @@ import entity.Utente;
 
 import java.sql.*;
 
-public class UtenteDao {
-    private static String USER = "root";
-    private static String PASS = "root";
-    //private static String DB_URL = "jdbc:mysql://localhost/logintest";
-    private static final String DB_URL = "jdbc:mariadb://127.0.0.1:3406/provadb";
-    //private static String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+public class UtenteDao2 {
+    private static String USER = "root";    //user db
+    private static String PASS = "root";    //password db
+
+    private static final String DB_URL = "jdbc:mariadb://127.0.0.1:3406/provadb";   //indirizzi db
     private static final String DRIVER_CLASS_NAME = "org.mariadb.jdbc.Driver";
 
-    public static Utente findByNameAndPassword(String username, String password) {
+    public static Utente insertNewUser() {
+
         // STEP 1: dichiarazioni
         Statement stmt = null;
         Connection conn = null;
@@ -22,20 +22,27 @@ public class UtenteDao {
             Class.forName(DRIVER_CLASS_NAME);
 
             // STEP 3: apertura connessione
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);     //connessione con database specificato prima
 
             // STEP 4: creazione ed esecuzione della query
-            stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+            stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,  //ResultSet è oggetto che contiene il risultato della query
                     ResultSet.CONCUR_READ_ONLY);
-            String sql = "SELECT nome, cognome, username, " +
+
+
+            String query = "INSERT INTO utenti VALUES ('ceci','bho','root2','root2');";
+
+            /*
+            String sql = "SELECT nome, cognome, username, " +             //scrivo query in SQL
                     "password FROM utenti where username = '"
                     + username + "' AND password = '" + password + "';";
-            ResultSet rs = stmt.executeQuery(sql);
+            */
+
+            ResultSet rs = stmt.executeQuery(query);                        //eseguo query
 
             if (!rs.first()) // rs not empty
                 return null;
 
-            boolean moreThanOne = rs.first() && rs.next();
+            boolean moreThanOne = rs.first() && rs.next();                  //mette cursore alla prima riga
             assert !moreThanOne; // per abilitare le asserzioni, avviare la JVM con il parametro -ea
             // (Run Configurations -> <configurazione utilizzata per l'avvio del server> -> Arguments -> VM Arguments).
             // N.B. Le asserzioni andrebbero usate solo per test e debug, non per codice in produzione
@@ -48,7 +55,7 @@ public class UtenteDao {
             String cognome = rs.getString("cognome");
             String usernameLoaded = rs.getString("username");
 
-            assert (usernameLoaded.equals(username));
+            //assert (usernameLoaded.equals(username));
 
             u = new Utente(usernameLoaded, "",
                     nome, cognome);
@@ -84,5 +91,9 @@ public class UtenteDao {
         if ("myusername".equals(username) && "mypassword".equals(password))
             return new Utente("myusername", "", "Tizio","Caio");
         else return null;
+    }
+
+    public static void main(String[] args){
+        Utente myUser = insertNewUser();
     }
 }
